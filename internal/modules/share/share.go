@@ -49,7 +49,7 @@ func GenSubData(genConfigStr string) []byte {
 		result.Write(rename(node.Base.Raw, newName.Bytes()))
 		result.Write(newLine)
 	}
-	resultStr := subconv.Convert(result.String(), genConfig.Target)
+	resultStr := subconv.ConvertData(result.String(), genConfig.Target)
 	return []byte(resultStr)
 }
 

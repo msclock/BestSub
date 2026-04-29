@@ -80,17 +80,10 @@ func setupPaths(config *config.Base, configPath string) {
 		config.Log.Path = filepath.Join(configDir, "log")
 	}
 
-	if config.Session.AuthPath == "" {
-		config.Session.AuthPath = filepath.Join(configDir, "session", "auth.session")
-	}
-
 	if config.Session.NodePath == "" {
 		config.Session.NodePath = filepath.Join(configDir, "session", "node.session")
 	}
 
-	if config.SubConverter.Path == "" {
-		config.SubConverter.Path = filepath.Join(configDir, "subconverter")
-	}
 }
 
 func loadFromFile(config *config.Base, filePath string) error {
@@ -135,9 +128,6 @@ func loadFromEnv(config *config.Base) {
 	if jwtSecret := os.Getenv("BESTSUB_JWT_SECRET"); jwtSecret != "" {
 		config.JWT.Secret = jwtSecret
 	}
-	if sessionFile := os.Getenv("BESTSUB_SESSION_FILE"); sessionFile != "" {
-		config.Session.AuthPath = sessionFile
-	}
 }
 
 func parsePort(portStr string) (int, error) {
@@ -160,8 +150,6 @@ func createDefaultConfig(filePath string) error {
 	bytes := make([]byte, 32)
 	rand.Read(bytes)
 	baseConfig.JWT.Secret = hex.EncodeToString(bytes)
-	baseConfig.SubConverter.Port = 25500
-	baseConfig.SubConverter.Host = "127.0.0.1"
 
 	data, err := json.MarshalIndent(baseConfig, "", "    ")
 	if err != nil {
@@ -278,11 +266,11 @@ func validateJWTConfig(config *config.JWTConfig) error {
 }
 
 func validateSessionConfig(config *config.SessionConfig) error {
-	if config.AuthPath == "" {
-		return fmt.Errorf("会话文件路径不能为空")
+	if config.NodePath == "" {
+		return fmt.Errorf("节点会话文件路径不能为空")
 	}
 
-	dir := filepath.Dir(config.AuthPath)
+	dir := filepath.Dir(config.NodePath)
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return fmt.Errorf("无法创建会话目录 %s: %v", dir, err)
 	}
